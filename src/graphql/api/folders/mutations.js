@@ -5,6 +5,8 @@ export const MUTATION_CREATE_FOLDER = gql`
     createFolder(data: $data) {
       name
       templateId
+      id
     }
   }
 `;
+

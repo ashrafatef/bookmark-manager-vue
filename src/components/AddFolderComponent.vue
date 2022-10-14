@@ -23,7 +23,10 @@ import { MUTATION_CREATE_FOLDER } from "../graphql/api/folders/mutations.js";
 export default {
   name: "AddFolderComponent",
   data() {
-    return {};
+    return {
+      folders:[],
+      folderName:''
+    };
   },
   methods: {
     addNewFolder() {
@@ -41,10 +44,9 @@ export default {
         })
         .then((res) => {
           const { id, name } = res.data.createFolder;
-          this.folders.push({ id, name });
+          this.folders.push({ id, name } );
           this.folderName = "";
-          this.$root.$emit("folder_added", { id, name });
-          alert("Folder created successfully");
+          this.$root.$emit('folderAdded', { id, name });
         })
         .catch((err) => {
           console.log(err);

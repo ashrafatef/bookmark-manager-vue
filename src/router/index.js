@@ -21,7 +21,7 @@ const routes = [
     children: [
       {
         path: '/',
-        component: MembersView
+        component: TemplateView
       },
       {
         path: '/templates',

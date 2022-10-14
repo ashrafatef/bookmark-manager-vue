@@ -1,5 +1,5 @@
 <template>
-  <v-col cols="3" class="text-center">
+  <v-col class="text-center">
     <v-card class="mx-auto my-12" max-width="374">
       <v-card-title class="text-center">{{ folder.name }} </v-card-title>
 
@@ -51,7 +51,9 @@
             </v-card-actions>
           </v-card>
         </v-dialog>
-        <v-icon large color="black darken-2"> mdi-delete </v-icon>
+        <v-icon large color="black darken-2" @click="deleteFolder()">
+          mdi-delete
+        </v-icon>
       </v-card-actions>
     </v-card>
   </v-col>
@@ -61,6 +63,7 @@
 import LinkComponent from "./LinkComponent.vue";
 import { QUERY_LINKS_BY_FOLDER_ID } from "../graphql/api/links/queries.js";
 import { MUTATION_CREATE_LINK } from "../graphql/api/links/mutations.js";
+import { MUTATION_DELETE_FOLDER } from "../graphql/api/folders/mutation-delete.js";
 export default {
   name: "AppFolders",
   props: ["folder"],
@@ -71,10 +74,10 @@ export default {
     title: "",
   }),
   methods: {
-    linkDeleted(linkId){
-      this.links = this.links.filter(link=>{
-        return link.id != linkId 
-      })
+    linkDeleted(linkId) {
+      this.links = this.links.filter((link) => {
+        return link.id != linkId;
+      });
     },
     getLinksByFolder() {
       this.$apollo
@@ -94,7 +97,6 @@ export default {
         value: this.link,
         folderId: parseInt(this.folder.id, 10),
       };
-      console.log(newLink)
       this.$apollo
         .mutate({
           mutation: MUTATION_CREATE_LINK,
@@ -113,11 +115,24 @@ export default {
           console.log(err);
         });
     },
+    deleteFolder() {
+      const folderId = parseInt(this.folder.id, 10)
+      this.$apollo
+        .mutate({
+          mutation: MUTATION_DELETE_FOLDER,
+          variables: {
+            id: folderId,
+          },
+        })
+        .then(() => {
+          this.$emit("folderDeleted", folderId);
+        })
+        .catch((err) => console.log(err));
+    },
   },
   mounted() {
     this.getLinksByFolder();
   },
   components: { LinkComponent },
-  
 };
 </script>

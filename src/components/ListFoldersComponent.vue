@@ -1,14 +1,16 @@
 <template>
-  <v-row>
-    <v-col cols="12" v-if="folders.length">
-      <div v-for="folder in folders" :key="folder.name">
-        <AppFolders v-bind:folder="folder" />
-      </div>
-    </v-col>
-    <v-col cols="12" v-if="!folders.length">
-      <h2>No Folder for this template !</h2>
-    </v-col>
-  </v-row>
+  <div>
+    <v-row v-if="folders.length">
+      <v-col cols="4" v-for="folder in folders" :key="folder.name">
+        <AppFolders v-bind:folder="folder" @folderDeleted="folderDeleted" />
+      </v-col>
+    </v-row>
+    <v-row v-if="!folders.length">
+      <v-col cols="12">
+        <h2>No Folder for this template !</h2>
+      </v-col>
+    </v-row>
+  </div>
 </template>
 
 <script>
@@ -23,10 +25,24 @@ export default {
       allFolders: [],
     };
   },
+  methods: {
+    handleAddFolder(e) {
+      console.log(e);
+    },
+    folderDeleted(id) {
+      // eslint-disable-next-line vue/no-mutating-props
+      this.folders = this.folders.filter((folder) => {
+        return folder.id != id;
+      });
+    },
+  },
   mounted() {
     this.allFolders = this.folders;
-    this.$root.$on("folder_added", (args) => {
-      this.allFolders.push(args);
+  },
+  created() {
+    this.$root.$on("folderAdded", (args) => {
+      // eslint-disable-next-line vue/no-mutating-props
+      this.folders.push(args);
     });
   },
 };

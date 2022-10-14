@@ -20,7 +20,6 @@ export default {
   },
   methods: {
     getUserTemplateFolders() {
-      console.log('user id', typeof this.$store.state.user.id)
       const userId =  this.$store.state.user.id
       this.$apollo
         .query({

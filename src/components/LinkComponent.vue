@@ -18,7 +18,6 @@ export default {
   methods: {
     removeLink() {
       const linkId = parseInt(this.link.id, 10);
-      console.log( this.link.id)
       this.$apollo
         .mutate({
           mutation: MUTATION_DELETE_LINK,
