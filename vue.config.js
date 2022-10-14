@@ -4,7 +4,7 @@ module.exports = defineConfig({
     'vuetify'
   ],
   devServer: {
-    disableHostCheck: true
+    allowedHosts: "all",
   },
   pluginOptions: {
     apollo: {
