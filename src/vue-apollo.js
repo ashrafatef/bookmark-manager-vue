@@ -67,12 +67,11 @@ const authLink = setContext((_, { headers }) => {
 // Call this in the Vue app file
 export function createProvider (options = {}) {
   // Create apollo client
-  const { apolloClient, wsClient } = createApolloClient({
-    ...defaultOptions,
+  const { apolloClient } = createApolloClient({
+    // ...defaultOptions,
     ...options,
     link:authLink,
   })
-  apolloClient.wsClient = wsClient
 
   // Create vue apollo provider
   const apolloProvider = new VueApollo({
