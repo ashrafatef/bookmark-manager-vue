@@ -1,20 +1,23 @@
 import Vue from 'vue'
 import VueApollo from 'vue-apollo'
-import { createApolloClient, restartWebsockets } from 'vue-cli-plugin-apollo/graphql-client'
-import { setContext } from 'apollo-link-context';
-
-// Install the vue plugin
+// import { setContext } from 'apollo-link-context';
+import { ApolloClient } from 'apollo-client'
+import { createHttpLink } from 'apollo-link-http'
+import { InMemoryCache } from 'apollo-cache-inmemory'
 Vue.use(VueApollo)
 
+
+// Install the vue plugin
+
 // Name of the localStorage item
-const AUTH_TOKEN = 'apollo-token'
+// const AUTH_TOKEN = 'apollo-token'
 
 // Http endpoint
-const httpEndpoint = process.env.VUE_APP_GRAPHQL_HTTP || 'http://localhost:3333'
+// const httpEndpoint = process.env.VUE_APP_GRAPHQL_HTTP || 'http://localhost:3333'
 // Files URL root
-export const filesRoot = process.env.VUE_APP_FILES_ROOT || httpEndpoint.substr(0, httpEndpoint.indexOf('/graphql'))
+// export const filesRoot = process.env.VUE_APP_FILES_ROOT || httpEndpoint.substr(0, httpEndpoint.indexOf('/graphql'))
 
-Vue.prototype.$filesRoot = filesRoot
+// Vue.prototype.$filesRoot = filesRoot
 
 // Config
 // const defaultOptions = {
@@ -52,25 +55,32 @@ Vue.prototype.$filesRoot = filesRoot
 // }
 
 
-const authLink = setContext((_, { headers }) => {
-  // get the authentication token from local storage if it exists
-  const token = localStorage.getItem('authorization_token') ;
-  // return the headers to the context so httpLink can read them
-  return {
-    headers: {
-      ...headers,
-      authorization: token ? `Bearer ${token}` : '',
-    },
-  };
-});
+// const authLink = setContext((_, { headers }) => {
+//   // get the authentication token from local storage if it exists
+//   const token = localStorage.getItem('authorization_token') ;
+//   // return the headers to the context so httpLink can read them
+//   return {
+//     headers: {
+//       ...headers,
+//       authorization: token ? `Bearer ${token}` : '',
+//     },
+//   };
+// });
 
 // Call this in the Vue app file
 export function createProvider (options = {}) {
+
+  const httpLink = createHttpLink({
+    // You should use an absolute URL here
+    uri: 'http://localhost:3333',
+  })
+
+  const cache = new InMemoryCache()
   // Create apollo client
-  const { apolloClient } = createApolloClient({
-    // ...defaultOptions,
+  const { apolloClient } = new ApolloClient({
     ...options,
-    link:authLink,
+    link:httpLink,
+    cache
   })
 
   // Create vue apollo provider
@@ -90,30 +100,3 @@ export function createProvider (options = {}) {
   return apolloProvider
 }
 
-// Manually call this when user log in
-export async function onLogin (apolloClient, token) {
-  if (typeof localStorage !== 'undefined' && token) {
-    localStorage.setItem(AUTH_TOKEN, token)
-  }
-  if (apolloClient.wsClient) restartWebsockets(apolloClient.wsClient)
-  try {
-    await apolloClient.resetStore()
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log('%cError on cache reset (login)', 'color: orange;', e.message)
-  }
-}
-
-// Manually call this when user log out
-export async function onLogout (apolloClient) {
-  if (typeof localStorage !== 'undefined') {
-    localStorage.removeItem(AUTH_TOKEN)
-  }
-  if (apolloClient.wsClient) restartWebsockets(apolloClient.wsClient)
-  try {
-    await apolloClient.resetStore()
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log('%cError on cache reset (logout)', 'color: orange;', e.message)
-  }
-}
